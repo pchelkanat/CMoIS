@@ -4,7 +4,7 @@ import numpy as np
 from ecdsa.numbertheory import jacobi
 from sympy import Matrix
 
-sieve_base = [2, 3, 5, 7, 11, 13, 17, 19,
+sieve_base = [3, 5, 7, 11, 13, 17, 19,
               23, 29, 31, 37, 41, 43, 47, 53,
               59, 61, 67, 71, 73, 79, 83, 89,
               97, 101, 103, 107, 109, 113, 127, 131,
@@ -112,32 +112,36 @@ def step_2(n, M, B):
     else:
         FB = find_factor_base(n, B)
         X, Y, powers = screening(t1, t2, FB)
-        print("B-гладкие числа: ", Y)
-        print("х-сы B-гладких чисел", X)
-        print("Полученные степени:\n", powers)
-
-        _, vec = Matrix(powers).rref()
-        mx = abs(np.array(Matrix(powers).nullspace()))
-        count, m = np.shape(mx)
-        print("Найдено решений %s:\n%s\n" % (count, mx))
-        if count != len(FB):
-            for i in range(count):
-                print("Решаем %s-е уравнение системы" % (i + 1))
-                p = find_p_q(n, X, Y, mx[i])
-                if (p == 0 or p == n) and count != 1:
-                    print("Тривиальное решение: %s, %s\nПробуем другое решение\n" % (p, n // p))
-                elif (p == 0 or p == n) and count == 1:
-                    print("Тривиальное решение: %s, %s\nПопробуем увеличить границы\n" % (p, n // p))
-                    return step_2(n, M + 30, B + 30)
-                else:
-                    print("Нетривиальные делители: %s, %s\n" % (p, n // p))
-                    return p, n // p
+        if len(X)<1:
+            return step_2(n, M + 30, B + 10)
         else:
-            print("Решений не найдено, попробуем увеличить границы")
-            step_2(n, M + 30, B + 30)
+            print("B-гладкие числа: ", Y)
+            print("х-сы B-гладких чисел", X)
+            print("Полученные степени:\n", powers)
+
+            _, vec = Matrix(powers).rref()
+            mx = abs(np.array(Matrix(powers).nullspace()))
+            count, m = np.shape(mx)
+            print("Найдено решений %s:\n%s\n" % (count, mx))
+            if count != len(FB):
+                for i in range(count):
+                    print("Решаем %s-е уравнение системы" % (i + 1))
+                    p = find_p_q(n, X, Y, mx[i])
+                    if (p == 0 or p == n) and count != 1:
+                        print("Тривиальное решение: %s, %s\nПробуем другое решение\n" % (p, n // p))
+                    elif (p == 0 or p == n) and count == 1:
+                        print("Тривиальное решение: %s, %s\nПопробуем увеличить границы\n" % (p, n // p))
+                        return step_2(n, M + 30, B + 10)
+
+                    else:
+                        print("Нетривиальные делители: %s, %s\n" % (p, n // p))
+                        return p, n // p
+            else:
+                print("Решений не найдено, попробуем увеличить границы")
+                return step_2(n, M + 30, B + 10)
 
 
 if __name__ == "__main__":
-    print(step_2(112093, 30, 11))
+    print(step_2(44381*40739, 30, 11))
     # print(step_2(97344, 40, 29))
     # print(step_2(364729, 40, 29))
