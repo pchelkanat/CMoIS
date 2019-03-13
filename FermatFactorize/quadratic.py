@@ -71,25 +71,6 @@ def screening(arrX, arrY, FB):
     return resX, resY, np.array(powers, dtype=np.int8).T % 2
 
 
-"""
-def solver(A):
-    m, n = np.shape(A)
-    used = []
-    for r in range(m):
-        used.append(0)
-
-    for k in range(n):
-        for r in range(m):
-            if A[r, k] and not used[r]:
-                for i in range(m):
-                    if A[i, k] and r != i:
-                        for j in range(n):
-                            A[i, j] = (A[i, j] + A[r, j]) % 2
-                used[r] = 1
-    return A
-"""
-
-
 def find_p_q(n, arrX, arrY, vec):
     y = 1
     X = 1
@@ -112,14 +93,14 @@ def step_2(n, M, B):
     else:
         FB = find_factor_base(n, B)
         X, Y, powers = screening(t1, t2, FB)
-        if len(X)<1:
-            return step_2(n, M + 30, B + 10)
+        if len(Y) < 1:
+            print("В-гладкие числа не найдены. Увеличиваем границы")
+            return step_2(n, M + 10, B + 10)
         else:
             print("B-гладкие числа: ", Y)
             print("х-сы B-гладких чисел", X)
             print("Полученные степени:\n", powers)
 
-            _, vec = Matrix(powers).rref()
             mx = abs(np.array(Matrix(powers).nullspace()))
             count, m = np.shape(mx)
             print("Найдено решений %s:\n%s\n" % (count, mx))
@@ -131,17 +112,17 @@ def step_2(n, M, B):
                         print("Тривиальное решение: %s, %s\nПробуем другое решение\n" % (p, n // p))
                     elif (p == 0 or p == n) and count == 1:
                         print("Тривиальное решение: %s, %s\nПопробуем увеличить границы\n" % (p, n // p))
-                        return step_2(n, M + 30, B + 10)
+                        return step_2(n, M + 10, B + 10)
 
                     else:
                         print("Нетривиальные делители: %s, %s\n" % (p, n // p))
                         return p, n // p
             else:
                 print("Решений не найдено, попробуем увеличить границы")
-                return step_2(n, M + 30, B + 10)
+                return step_2(n, M + 10, B + 10)
 
 
 if __name__ == "__main__":
-    print(step_2(44381*40739, 30, 11))
-    # print(step_2(97344, 40, 29))
-    # print(step_2(364729, 40, 29))
+    print(step_2(112093, 30, 11))
+    print(step_2(44381 * 40739, 30, 11))
+    print(step_2(364729, 20, 11))
